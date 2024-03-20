@@ -1,8 +1,8 @@
-use std::str;
 use std::time::{Duration, Instant};
 use serialport::SerialPort;
+use std::io::prelude::*;
+use std::io::BufReader;
 
-const BUFFER_SIZE: usize = 1024;
 const SAMPLING_RATE: usize = 1000;
 const RECORD_DURATION_SECOND: usize = 5;
 
@@ -17,14 +17,15 @@ fn get_port() -> Option<String> {
     None
 }
 
-fn start_record(mut port: Box<dyn SerialPort>) {
-    let mut buf = [0; BUFFER_SIZE];
+fn start_record(port: Box<dyn SerialPort>) {
+    let mut port = BufReader::new(port);
 
+    let mut line = String::new();
     for _ in 0..SAMPLING_RATE * RECORD_DURATION_SECOND {
-        let n = port.read(&mut buf).unwrap();
-        // let sample = str::from_utf8(&buf[..n]).unwrap();
-
-        // print!("{}", sample);
+        port.read_line(&mut line).unwrap();
+        let sample: u16 = line.trim().parse().unwrap();
+        println!("{}", sample);
+        line.clear();
     }
 }
 

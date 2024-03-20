@@ -7,6 +7,7 @@
 
 int main() {
 	stdio_init_all();
+	stdio_set_translate_crlf(&stdio_usb, false);
 
 	adc_init();
 	adc_gpio_init(ADC_PIN);
