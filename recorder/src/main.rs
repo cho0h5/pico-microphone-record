@@ -2,6 +2,12 @@ use std::time::{Duration, Instant};
 use serialport::SerialPort;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::io::BufWriter;
+use std::fs::File;
+use std::f32::consts::PI;
+use std::i16;
+use hound;
+use hound::WavWriter;
 
 const SAMPLING_RATE: usize = 1000;
 const RECORD_DURATION_SECOND: usize = 5;
@@ -17,7 +23,7 @@ fn get_port() -> Option<String> {
     None
 }
 
-fn start_record(port: Box<dyn SerialPort>) {
+fn start_record(port: Box<dyn SerialPort>, mut writer: WavWriter<BufWriter<File>>) {
     let mut port = BufReader::new(port);
 
     let mut line = String::new();
@@ -26,6 +32,9 @@ fn start_record(port: Box<dyn SerialPort>) {
         let sample: u16 = line.trim().parse().unwrap();
         println!("{}", sample);
         line.clear();
+
+        let sample = sample as f32 / 4096.0 * 65536.0 - 65536.0 / 2.0;
+        writer.write_sample(sample as i16).unwrap();
     }
 }
 
@@ -37,8 +46,16 @@ fn main() {
         .timeout(Duration::from_millis(10))
         .open().expect("Failed to open port");
 
+    let spec = hound::WavSpec {
+        channels: 1,
+        sample_rate: 1000,
+        bits_per_sample: 16,
+        sample_format: hound::SampleFormat::Int,
+    };
+    let writer = hound::WavWriter::create("record.wav", spec).unwrap();
+
     let start = Instant::now();
-    start_record(port);
+    start_record(port, writer);
     let duration = start.elapsed();
     println!("elapsed time: {:?}", duration);
 }
