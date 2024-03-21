@@ -14,9 +14,18 @@ int main() {
 	adc_select_input(ADC_NUM);
 
 	while (true) {
+		char c[2];
+
 		uint adc_raw = adc_read();
-		printf("%d\n", adc_raw);
-		sleep_ms(1);
+
+		// printf("%d\n", adc_raw);
+
+		c[0] = adc_raw >> 8;
+		c[1] = adc_raw;
+		write(1, c, 2);
+
+		// sleep_ms(1);
+		sleep_us(250);
 		// sleep_us(125);
 	}
 }

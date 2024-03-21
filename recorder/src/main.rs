@@ -9,7 +9,7 @@ use std::i16;
 use hound;
 use hound::WavWriter;
 
-const SAMPLING_RATE: usize = 1000;
+const SAMPLING_RATE: usize = 4000;
 const RECORD_DURATION_SECOND: usize = 5;
 
 fn get_port() -> Option<String> {
@@ -26,12 +26,11 @@ fn get_port() -> Option<String> {
 fn start_record(port: Box<dyn SerialPort>, mut writer: WavWriter<BufWriter<File>>) {
     let mut port = BufReader::new(port);
 
-    let mut line = String::new();
+    let mut buf = [0; 2];
     for _ in 0..SAMPLING_RATE * RECORD_DURATION_SECOND {
-        port.read_line(&mut line).unwrap();
-        let sample: u16 = line.trim().parse().unwrap();
+        port.read_exact(&mut buf).unwrap();
+        let sample = (buf[0] as i16) << 8 | buf[1] as i16;
         println!("{}", sample);
-        line.clear();
 
         let sample = sample as f32 / 4096.0 * 65536.0 - 65536.0 / 2.0;
         writer.write_sample(sample as i16).unwrap();
