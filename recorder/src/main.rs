@@ -30,9 +30,10 @@ fn start_record(port: Box<dyn SerialPort>, mut writer: WavWriter<BufWriter<File>
     for _ in 0..SAMPLING_RATE * RECORD_DURATION_SECOND {
         port.read_exact(&mut buf).unwrap();
         let sample = (buf[0] as i16) << 8 | buf[1] as i16;
+        let sample = sample - 2382;
         println!("{}", sample);
 
-        let sample = sample as f32 / 4096.0 * 65536.0 - 65536.0 / 2.0;
+        let sample = sample as f32 * 32768.0 / 4096.0 * 64.0;
         writer.write_sample(sample as i16).unwrap();
     }
 }
