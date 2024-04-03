@@ -9,7 +9,7 @@ use std::i16;
 use hound;
 use hound::WavWriter;
 
-const SAMPLING_RATE: usize = 4000;
+const SAMPLING_RATE: usize = 40000;
 const RECORD_DURATION_SECOND: usize = 5;
 
 fn get_port() -> Option<String> {
