@@ -25,7 +25,7 @@ int main() {
 	adc_select_input(ADC_NUM);
 
 	struct repeating_timer timer;
-	add_repeating_timer_us(250, timer_callback, NULL, &timer);
+	add_repeating_timer_us(25, timer_callback, NULL, &timer);
 
 	while (1) {
 		tight_loop_contents();
