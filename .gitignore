@@ -3,7 +3,6 @@ target/
 .DS_Store
 compile_flags.txt
 .cache/
-*.wav
 plot.py
 outfile
 fourie.py
